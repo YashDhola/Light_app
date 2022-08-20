@@ -54,6 +54,7 @@ class feedbackform extends StatelessWidget {
       home: Scaffold(
         appBar: AppBar(
           title: const Text("FeedBack Form"),
+          backgroundColor: Color.fromRGBO(61, 62, 63, 1),
         ),
         body: Column(
           children: [
@@ -71,6 +72,7 @@ class feedbackform extends StatelessWidget {
               padding: const EdgeInsets.all(10),
               child: TextField(
                 controller: issueController,
+                maxLines: 3,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   labelText: 'Issue',
@@ -82,6 +84,7 @@ class feedbackform extends StatelessWidget {
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                 child: ElevatedButton(
                     child: const Text('Submit'),
+                    style: ElevatedButton.styleFrom(primary: Color.fromRGBO(61, 62, 63, 1)),
                     onPressed: () async {
                       await _feedbacksubmit();
                     })),

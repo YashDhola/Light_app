@@ -29,6 +29,7 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
       target: LatLng(37.42796133580664, -122.085749655962), zoom: 14);
 
   Set<Marker> markerpoint = {};
+  Set<Marker> mark = {};
   var markerID = 0;
 
   //direction line
@@ -42,6 +43,9 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
 
   double distance = 0.0;
 
+  var locationCurrent = Location();
+  late LocationData currentLocation;
+
   @override
   void initState() {
     super.initState();
@@ -50,6 +54,13 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
 
   firstApprun() async {
     await location();
+    locationCurrent = new Location();
+    locationCurrent.onLocationChanged.listen((LocationData cLoc) {
+      currentLocation = cLoc;
+    });
+    print("bbbbb");
+    print(currentLocation.latitude);
+    print(currentLocation.longitude);
   }
 
   location() async {
@@ -58,7 +69,6 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
     googleMapController.animateCamera(CameraUpdate.newCameraPosition(
         CameraPosition(
             target: LatLng(position.latitude, position.longitude), zoom: 18)));
-    print("aaaaa");
     markerpoint.clear();
     markerpoint.add(Marker(
         markerId: const MarkerId('currentLocation'),
@@ -83,17 +93,18 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
               builder: (BuildContext context) {
                 return Expanded(
                   child: AlertDialog(
-                    title: Text('Welcome'),
-                    content: Text('GeeksforGeeks'),
+                    backgroundColor: Color.fromRGBO(61, 62, 63, 1),
+                    title: Text('Are You Sure?',style: TextStyle(color: Colors.white),),
                     actions: [
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const CurrentLocationScreen()));
+                        },
                         child: Text('CANCEL'),
                       ),
                       TextButton(
                         onPressed: () {
-                          print("BBBBBBBB");
-                          Navigator.push(
+                          Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
                                 builder: (context) => feedbackform(
@@ -167,7 +178,6 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
       PointLatLng(startLocation.latitude, startLocation.longitude),
       PointLatLng(endLocation.latitude, endLocation.longitude),
       travelMode: TravelMode.driving,
-
     );
 
     if (result.points.isNotEmpty) {
@@ -232,7 +242,10 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
   Future<Position> _determinePosition() async {
     bool serviceEnabled;
     LocationPermission permission;
+    // Location location = Location();
+    // late LocationData _locationData;
 
+    //serviceEnabled = await location.isBackgroundModeEnabled();
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
 
     if (!serviceEnabled) {
@@ -253,7 +266,8 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
       return Future.error('Location permissions are permanently denied');
     }
 
-    Position position = await Geolocator.getCurrentPosition();
+    Future<Position> position = Geolocator.getCurrentPosition();
+    //_locationData = await location.getLocation();
 
     return position;
   }
@@ -280,8 +294,8 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
           mapType: MapType.normal,
           polylines: Set<Polyline>.of(polylines.values),
           markers: Set<Marker>.of(markerpoint),
-          onMapCreated: (GoogleMapController controller) {
-            googleMapController = controller;
+          onMapCreated: (mapController) {
+            googleMapController=mapController;
           },
         ),
         // Positioned(
